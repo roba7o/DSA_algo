@@ -26,31 +26,93 @@ def gcd(m,n):
 
 class Fraction:
     def __init__(self,top,bottom):
-         self.num = top/gcd(top,bottom)
-         self.den = bottom/gcd(top,bottom)
-         
+        # self.num= top
+        # self.den = bottom
+
+        if isinstance(top, int):
+            self.num= top
+        else:
+            raise ValueError("Top isn't an int")
+            
+        if isinstance(bottom, int):
+            self.den = bottom
+        else:
+            raise ValueError("bottom isn't an int")
+        
+        if self.den < 0 and self.num > 0:
+            self.den = -self.den
+            self.num = -self.num
+
+        common = gcd(self.num,self.den)
+        self.num = self.num//common
+        self.den = self.den//common
+    
+    #Getters
     def getNum(self):
         return self.num
     
     def getDen(self):
         return self.den
 
+    #Prints
     def __str__(self):
+        return str(self.num)+"/"+str(self.den)
+    
+    def __repr__(self):
         return str(self.num)+"/"+str(self.den)
 
     def show(self):
         print(self.num,"/",self.den)
 
-    def __add__(self,otherfraction):
-        newnum = self.num*otherfraction.den + self.den*otherfraction.num
-        newden = self.den * otherfraction.den
-        common = gcd(newnum,newden)
-        return Fraction(newnum//common,newden//common)
-
+    #relational
     def __eq__(self, other):
         firstnum = self.num * other.den
         secondnum = other.num * self.den
         return firstnum == secondnum
+    
+    def __ne__(self, other):
+        firstnum = self.num * other.den
+        secondnum = other.num * self.den
+        return firstnum != secondnum
+    
+    def __gt__(self, other):
+        firstnum = self.num * other.den
+        secondnum = other.num * self.den
+        return firstnum > secondnum
+    
+    def __ge__(self, other):
+        firstnum = self.num * other.den
+        secondnum = other.num * self.den
+        return firstnum >= secondnum
+    
+    def __lt__(self, other):
+        firstnum = self.num * other.den
+        secondnum = other.num * self.den
+        return firstnum < secondnum
+    
+    def __le__(self, other):
+        firstnum = self.num * other.den
+        secondnum = other.num * self.den
+        return firstnum <= secondnum
+
+    #Computational
+    def __add__(self,other):
+        if (isinstance(other, int)):
+            other = Fraction(1,1)
+        newnum = self.num*other.den + self.den*other.num
+        newden = self.den * other.den
+        common = gcd(newnum,newden)
+        return Fraction(newnum//common,newden//common)
+
+    #You want this if the left side (self) is a integer
+    # a + b == b + a when a or b == int or fraction
+    def __radd__(self, other):
+        return self.__add__(other)
+    
+    def __iadd__(self, other):
+        self = self.__add__(other)
+        return self
+
 
     def __truediv__(self, other):
         new_num = self.num * other.den
@@ -79,10 +141,30 @@ class Fraction:
 
 x = Fraction(1,2)
 y = Fraction(2,3)
+#string functions
+print(f"x is {x}")
+print("y is {}".format(y))
 
-print(x.getDen())
-print(x.getNum())
-print(x+y)
+#getters
+print(f"x num = {x.getNum()}")
+print(f"x den = {x.getDen()}")
+
+#normal add
+print(f"x+y--> {x+y}")
+
+#add integer and also radd
+print(f"x+1--> {x+1}")
+print(f"1+x--> {1+x}")
+
+#iadd
+print(f"x is {x}")
+print("y is {}".format(y))
+x += y
+print(f"iadd fucntion: x += y")
+print(f"x is now {x}")
+print("y is still  {}".format(y))
+
+#standard ones
 print(x == y)
 print(y*x)
 print(y/x)
