@@ -10,7 +10,6 @@ class LogicGate:
         self.output = self.performGateLogic()
         return self.output
 
-
 class BinaryGate(LogicGate):
     def __init__(self,n):
         super(BinaryGate, self).__init__(n)
@@ -89,7 +88,20 @@ class NorGate(BinaryGate):
             return 1
         else:
             return 0
+        
+class XorGate(BinaryGate):
 
+    def __init__(self,n):
+        BinaryGate.__init__(self,n)
+
+    def performGateLogic(self):
+
+        a = self.getPinA()
+        b = self.getPinB()
+        if a ==b:
+            return 0
+        else:
+            return 1
 
 class UnaryGate(LogicGate):
     def __init__(self,n):
@@ -107,7 +119,6 @@ class UnaryGate(LogicGate):
             self.pin = source
         else:
             print("Cannot Connect: NO EMPTY PINS on this gate")
-
 
 class NotGate(UnaryGate):
     def __init__(self,n):
@@ -131,7 +142,6 @@ class Connector:
     def getTo(self):
         return self.togate
 
-
 def main():
     # Create gates
     g1 = NorGate("G1")
@@ -144,4 +154,5 @@ def main():
 
     print(g4.getOutput())
 
-main()
+if __name__ == "__main__":
+    main()
