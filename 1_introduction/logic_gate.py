@@ -15,18 +15,28 @@ class BinaryGate(LogicGate):
         super(BinaryGate, self).__init__(label)
         self.pinA = None
         self.pinB = None
+        self.binary_inputs = (1,0)
 
+    
     def getPinA(self):
         if self.pinA is None:
             return int(input("Enter Pin A input for gate "+self.getLabel()+"-->"))
-        else:
+        elif self.pinA in self.binary_inputs:
+            return self.pinA
+        elif isinstance(self.pinA, Connector):
             return self.pinA.getFrom().getOutput()
+        else:
+            raise ValueError("Your pin is not of valid type")
 
     def getPinB(self):
         if self.pinB is None:
             return int(input("Enter Pin B input for gate "+self.getLabel()+"-->"))
-        else:
+        elif self.pinB in self.binary_inputs:
+            return self.pinB
+        elif isinstance(self.pinB, Connector):
             return self.pinB.getFrom().getOutput()
+        else:
+            raise ValueError("Your pin is not of valid type")
 
 
     def setNextPin(self,source):
@@ -142,6 +152,7 @@ class Connector:
 
     def getTo(self):
         return self.togate
+    
 
 def main():
     # Create gates
