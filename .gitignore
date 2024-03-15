@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -24,3 +24,4 @@ venv/
 *.log
 *.swp
 .DS_Store
+1_introduction/__pycache__/logic_gate.cpython-312.pyc
