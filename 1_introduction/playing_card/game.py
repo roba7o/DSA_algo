@@ -6,19 +6,23 @@ from participant import *
 
 class Game:
     def __init__(self, game):
-        self.game = None
+        self.game = game
         self.deck = [Card(suit, rank) for suit in suit_list_string for rank in rank_list_string]
         random.shuffle(self.deck)
         self.number_of_players = None
         self.participants = []
         self.dealer = None
 
+    #! for debugging
     def print_list_of_deck_objects(self):
         for card in self.deck:
             print(card)
 
-    def shuffle_deck(self):
-        random.shuffle(self.deck)
+    def debug_list_budgets(self):
+        for player in self.participants:
+            print(f"{player.name} has {player.budget}")
+    #! for debugging
+
 
     def __str__(self):
         return f"playing {self.game}"
@@ -34,7 +38,12 @@ class Game:
             except ValueError:
                 print("Enter a number freak")
     
-    def establish_player_types(self):
+
+    
+    def establish_participant_types(self):
+        """
+        Creates list of participants who will make moves
+        """
         #dealer
         self.dealer = Dealer()
         print(self.dealer)
@@ -55,36 +64,92 @@ class Game:
             #print(computer_player)
             self.participants.append(computer_player)
         
-    def debug_list_budgets(self):
+    
+
+    def remove_card_from_deck(self, person):
+        """
+        takes once card from deck and adds to person
+        """
+        card = self.deck[0]
+        person.add_card(card)
+        del self.deck(card)
+
+    
+    def establish_stake(self):
+        """
+        establishes stake for each player. 
+        TODO can probably go into another function as it only happens once in init
+        """
         for player in self.participants:
-            print(f"{player.name} has {player.budget}")
+            bet = player.place_bet()
+            player.remove_stake_from_budget(bet)           
 
+    
+    def establish_initial_hand(self):
+        """
+        gives each partipant 2 cards
+        """
+        self.remove_card_from_deck(self.dealer)
+        self.remove_card_from_deck(self.dealer)
 
-    def make_bet(self):
         for player in self.participants:
-            player.place_bet()
+            self.remove_card_from_deck(player)
+            self.remove_card_from_deck(player)
 
+ 
+    def print_hands(self, round_hidden):
+        """
+        prints hand.
+        todo else function needs changed as it wont go through all cards. only the first two 
+        
+        """
+        if round_hidden is True:
+            print(f"{self.dealer.name} has {self.dealer.hand[1]} and mystery")
+            for player in self.participants:
+                print(f"{player.name} has {player.hand[0]} and {player.hand[1]}")
+        else:
+            print(f"{self.dealer.name} has {player.hand[0]} and {player.hand[1]}")
+            for player in self.participants:
+                print(f"{player.name} has {player.hand[0]} and {player.hand[1]}")
+     
 
-
+    
+    
 # class BlackJack(Game):
 #     def __init__(self, game, number_of_players):
 #         super().__init__(game, number_of_players)
     
 def main():
     poker_game = Game("Black Jack")
+    print(poker_game)
 
 
     #1) ask how many and what type of player is playing
     poker_game.get_number_of_players()
-    poker_game.establish_player_types()
+    poker_game.establish_participant_types()
 
     poker_game.debug_list_budgets()
-    poker_game.make_bet()
-
-
-    #TO DO, at this point. Everyone should have their own name and budget and initial bet (parent class) 
+    poker_game.establish_stake()
 
     #2) Establish dealer deck and deal hand.
+
+    round_one = True
+    poker_game.establish_initial_hand()  #all players get 3 cards, make the print function 
+    poker_game.print_hands(round_one)
+    round_one = False
+
+    poker_game.participants_make_move()
+    poker_game.print_hands(round_one)
+
+    poker_game.dealer_make_move()
+    poker_game.establish_winnings()
+        #TODO this is where you establish the 1.5 winnngs in blackjack based on hands. From here you then print what people lost and won to stop so many fucntions being made
+        #The logic of ace high and low will be hard. perhaps always high until bust then drops to lower and recursion?
+    
+    if poker_game.another_game(poker_game):
+        main()
+    else:
+        print("see you soon ")
 
         #-> after this everyone should have their own 2 hands. and the screen should print:
             # the dealers (at first 1. face-up 2. hole-card)
@@ -114,6 +179,10 @@ def main():
     Double Down: - easy to code (ask user, and for computer if less than 12 then one in every 6)
     After receiving the first two cards, a player may 
                  choose to double their original bet and receive only one more card.
+
+    TODO : To do something
+    ! does not work !
+    
     """    
 
 
