@@ -11,6 +11,7 @@ class Participant:
         #print(f"testing if if i have name {self.random_name} and budget: {self.random_budget}")
         self.name = None
         self.budget = None
+        self.stake = None
 
     def add_card(self, card):
         if isinstance(card, Card):
@@ -21,20 +22,12 @@ class Participant:
     def remove_stake_from_budget(self, stake):
         self.budget -= stake
 
-    #each participant should make a move same way.
-    def make_move(self, move):
-        while True:
-            try:
-                move = input("Hit or Stand")
-                if move.lower().startswith("h"):
-                    self.get_card()
-                    break
-                elif move.lower().startswith("l"):
-                    break
-                else:
-                    raise ValueError("hit or stand mate")
-            except ValueError:
-                print("please be normal")
+    #each computer participant should make a move same way. players will overide this fucntion for input 
+        
+    def make_move(self):
+        if self.evaluate_deck < 17:
+            return True
+        return False
 
     def generate_random_name_and_budget(self):
         with open('names_with_numbers.json', 'r') as name_json_file:
@@ -51,12 +44,61 @@ class Participant:
 
     def print_name(self):
         print(self.name)
+
+    def print_hand_list(self):
+        return ", ".join(str(card) for card in self.hand)
+    
+    def evaluate_deck(self):
+    #todo make this for computer
+        non_ace_sum = 0
+        num_of_aces = 0
+        total_sum = 0
+        for card in self.hand:
+            if card.rank != "Ace":
+                non_ace_sum += card.card_power()
+            else:
+                num_of_aces += 1
+        if num_of_aces > 1:
+            total_sum = non_ace_sum + num_of_aces
+        else:
+            if non_ace_sum < 11:
+                total_sum += 11
+            else:
+                non_ace_sum += 1
+        return total_sum
   
 
 class MyPlayer(Participant):
     def __init__(self, name):
         super().__init__()
         self.name = name
+
+    def evaluate_deck(self):
+        sum = 0
+        for card in self.hand:
+            if card.rank != "Ace":
+                sum += card.card_power()
+            else:
+                while True:
+                    try:
+                        ace_decision = int(input("11 or 1 for Ace? "))
+                        sum += ace_decision
+                        break
+                    except ValueError:
+                        print("Please select 1 or 11")
+
+    def make_move(self):
+        while True:
+            try:
+                move = input("Hit or Stand")
+                if move.lower().startswith("h"):
+                    return True
+                elif move.lower().startswith("s"):
+                    return False
+                else:
+                    raise ValueError("hit or stand mate")
+            except ValueError:
+                print("please be normal")
 
     def __str__(self):
         return f"Hello my name is {self.name}"
@@ -113,14 +155,16 @@ class ComputerPlayer(Participant):
     
     def place_bet(self):
         return random.randint(1000, self.budget)
+    
+    #todo make move for computer based on score. returns true or f
          
 
 class Dealer(Participant):
     def __init__(self):
         super().__init__()
-        self.name = self.random_name
+        self.name = "dealer " + self.random_name
         self.budget = 10000000
     
     def __str__(self):
-        return f"Hello my name is {self.name} and I am your dealer"
+        return f"Hello i am {self.name}"
 

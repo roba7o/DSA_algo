@@ -17,7 +17,7 @@ rank_list_dict = {
 }
 
 rank_list_string = list(rank_list_dict.keys())
-print(rank_list_string)
+#print(rank_list_string)
 #Perhaps use inheritance for card games? 
 class Card:
     def __init__(self, suit, rank):
@@ -49,7 +49,16 @@ class Card:
             raise ValueError("Invalid Rank")
         self._rank = new_rank
 
+    #TODO they both do same thing. I just cant ask user here what they want to do as comp will be different
     def card_power(self):
+        if self.rank != "Ace":
+            return rank_list_dict[self.rank]
+        else:
+            return rank_list_dict[self.rank]
         
-    
-        return rank_list_dict[self.rank]
+
+if __name__ == "__main__":
+    ace_card = Card("Spades", "Ace")
+    non_ace_card = Card("Spades", "Jack")
+    print(ace_card.card_power())
+    print(non_ace_card.card_power())

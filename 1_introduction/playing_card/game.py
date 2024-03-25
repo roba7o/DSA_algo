@@ -70,9 +70,9 @@ class Game:
         """
         takes once card from deck and adds to person
         """
-        card = self.deck[0]
-        person.add_card(card)
-        del self.deck(card)
+        card_to_remove = self.deck[0]
+        person.add_card(card_to_remove)
+        self.deck.remove(card_to_remove)
 
     
     def establish_stake(self):
@@ -82,7 +82,8 @@ class Game:
         """
         for player in self.participants:
             bet = player.place_bet()
-            player.remove_stake_from_budget(bet)           
+            player.remove_stake_from_budget(bet)
+            player.stake = bet           
 
     
     def establish_initial_hand(self):
@@ -100,76 +101,112 @@ class Game:
     def print_hands(self, round_hidden):
         """
         prints hand.
-        todo else function needs changed as it wont go through all cards. only the first two 
-        
         """
         if round_hidden is True:
-            print(f"{self.dealer.name} has {self.dealer.hand[1]} and mystery")
+            print(f"{self.dealer.name} has {self.dealer.hand[0]} and mystery")
             for player in self.participants:
-                print(f"{player.name} has {player.hand[0]} and {player.hand[1]}")
+                print(f"{player.name} has {player.print_hand_list()}")
+                #print("/")
         else:
-            print(f"{self.dealer.name} has {player.hand[0]} and {player.hand[1]}")
+            print(f"{self.dealer.name} has {self.dealer.print_hand_list()}")
             for player in self.participants:
-                print(f"{player.name} has {player.hand[0]} and {player.hand[1]}")
-     
+                print(f"{player.name} has {player.print_hand_list()}")
+                print("/")
 
-    
-    
-# class BlackJack(Game):
-#     def __init__(self, game, number_of_players):
-#         super().__init__(game, number_of_players)
+    def participants_make_move(self):
+        for participant in self.participants:
+            while True:
+                print(f"{str(participant)} you are on {participant.evaluate_deck()}")
+                move = participant.make_move()
+                if move:
+                    print(f"{participant.name} HIT!")
+                    self.remove_card_from_deck(participant)
+                    print(f"{participant.name} has {participant.print_hand_list()}")
+                else:
+                    print(f"{participant.name} stands lol")
+                    print(f"{participant.name} has {participant.print_hand_list()}")
+                    break
+
+    def establish_winnings(self):
+
+        for player in self.participants:
+            if player.evaluate_deck() > 21:
+                print(f"{str(player)} went BUST LMFAO at {player.evaluate_deck()}")
+                self.participants.remove(player)
+
+        print(f"{self.dealer.name} has {self.dealer.print_hand_list()} at {self.dealer.evaluate_deck()}")
+
+        for player in self.participants:
+            print(f"{player.name} has {player.print_hand_list()} at {player.evaluate_deck()}")
+            if player.evaluate_deck() == 21 and len(player.hand) == 2:
+                print("You have BlackJack... nice one!")
+                if self.dealer.evaluate_deck() == 21 and len(self.dealer.hand) == 2:
+                    print(f"... but so did the dealer. Unlucky. Keep your stake of {player.stake}")
+                    player.budget += player.stake
+                    player.stake = 0
+                else:
+                    print(f"and the dealer didnt... you the winner. you won {player.stake}")
+                    player.budget += player.stake * 2
+                    player.stake = 0
+
+            elif player.evaluate_deck() > self.dealer.evaluate_deck():
+                print(f"nice play.. you won {player.stake}")
+                player.budget += player.stake * 2
+                player.stake = 0
+
+            elif player.evaluate_deck() < self.dealer.evaluate_deck():
+                print(f"unlucky mate you lost {player.stake}")
+                player.budget -= player.stake
+                player.stake = 0
+            else:
+                print(f"PUSH you have {player.evaluate_deck()} but so did the dealer")
+                player.budget += player.stake
+                player.stake = 0           
+            print("/")
+
     
 def main():
-    poker_game = Game("Black Jack")
-    print(poker_game)
-
-
-    #1) ask how many and what type of player is playing
-    poker_game.get_number_of_players()
-    poker_game.establish_participant_types()
-
-    poker_game.debug_list_budgets()
-    poker_game.establish_stake()
-
-    #2) Establish dealer deck and deal hand.
-
-    round_one = True
-    poker_game.establish_initial_hand()  #all players get 3 cards, make the print function 
-    poker_game.print_hands(round_one)
-    round_one = False
-
-    poker_game.participants_make_move()
-    poker_game.print_hands(round_one)
-
-    poker_game.dealer_make_move()
-    poker_game.establish_winnings()
-        #TODO this is where you establish the 1.5 winnngs in blackjack based on hands. From here you then print what people lost and won to stop so many fucntions being made
-        #The logic of ace high and low will be hard. perhaps always high until bust then drops to lower and recursion?
-    
-    if poker_game.another_game(poker_game):
-        main()
-    else:
-        print("see you soon ")
-
-        #-> after this everyone should have their own 2 hands. and the screen should print:
-            # the dealers (at first 1. face-up 2. hole-card)
-            # every players cards face up (print hand function with dealers being diferent maybe if statement for the first round)
-
-
-    #3) 2) ask player ask what bet they want with their hand (hit or stand)
-        #for player in players - > player.make move
-        #if computers players hand > 16 - stay
-    
-        #once all players either stand or bust then dealer rebeals hole card.
-        #dealer must hit until above 17
-
+    game_on = True    
+    while game_on:
         
-    #5) #if hit blackjack -> 1.5 stake back unless dealer also blackjack then push: player gets stake back 
-       
-       #this doesnt need coded -> maybe prevent the player making hit in their make_move function as it should print (you have blackjack return 'stand' (so ask anyway but always result stand))
+        poker_game = Game("Black Jack")
+        print(poker_game)
 
+        #1) ask how many and what type of player is playing
+        poker_game.get_number_of_players()
+        poker_game.establish_participant_types()
 
-    #extra
+        poker_game.debug_list_budgets()
+        poker_game.establish_stake()
+
+        #2) Establish dealer deck and deal hand.
+        round_one = True
+        poker_game.establish_initial_hand()  #all players get 3 cards, make the print function 
+        poker_game.print_hands(round_one)
+        round_one = False
+
+        poker_game.participants_make_move()
+        poker_game.print_hands(round_one)
+
+        poker_game.dealer.make_move()
+        poker_game.establish_winnings()
+
+        #todo refactor this repeated user input code to 
+        while True:
+            try:
+                another_game = input("Another game? Yes/No")
+                if another_game.lower().startswith('y'):
+                    print("Allez")
+                    break
+                elif another_game.lower().startswith('n'):
+                    print("Have a good day mate!")
+                    game_on = False
+                    break
+                else:
+                    print("yes or no mate")
+            except ValueError:
+                print("Enter a YES OR NO freak")
+
     """
     Split: If a player's first two cards have the same value, they can choose to split the cards into 
             two separate hands and play each hand individually. 
@@ -180,13 +217,7 @@ def main():
     After receiving the first two cards, a player may 
                  choose to double their original bet and receive only one more card.
 
-    TODO : To do something
-    ! does not work !
-    
     """    
-
-
-
 
 if __name__ == "__main__":
     main()
