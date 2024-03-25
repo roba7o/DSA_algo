@@ -2,7 +2,7 @@ from card import *
 import random
 from participant import *
 
-
+#TODO fix * import
 
 class Game:
     def __init__(self, game):
@@ -116,31 +116,41 @@ class Game:
     def participants_make_move(self):
         for participant in self.participants:
             while True:
-                print(f"{str(participant)} you are on {participant.evaluate_deck()}")
+                participant.score_of_stand_hand = participant.evaluate_deck()
+                print(f"{str(participant)} you are on {participant.score_of_stand_hand}")
                 move = participant.make_move()
                 if move:
                     print(f"{participant.name} HIT!")
                     self.remove_card_from_deck(participant)
-                    print(f"{participant.name} has {participant.print_hand_list()}")
+                    print(f"{participant.name} has {participant.print_hand_list()} at score {participant.score_of_stand_hand}")
+                    participant.score_of_stand_hand = participant.evaluate_deck()
+
+                    if participant.score_of_stand_hand > 21:
+                        print(f"{participant.name} went BUST LMFAO at {participant.score_of_stand_hand}... see ya!")
+                        self.participants.remove(participant)
+                        print(f"remaining {(self.participants)}")
+                        break
                 else:
                     print(f"{participant.name} stands lol")
                     print(f"{participant.name} has {participant.print_hand_list()}")
+                    participant.score_of_stand_hand = participant.evaluate_deck()
                     break
 
     def establish_winnings(self):
+        print("***********************************************")
+        print("Remaining players... lets go!")       
+        print("***********************************************")
+        self.dealer.score_of_stand_hand = self.dealer.evaluate_deck()
+        print(f"{self.dealer.name} has {self.dealer.print_hand_list()} at {self.dealer.score_of_stand_hand}")
+        print("***********************************************")
+        print("And for the players!")
 
         for player in self.participants:
-            if player.evaluate_deck() > 21:
-                print(f"{str(player)} went BUST LMFAO at {player.evaluate_deck()}")
-                self.participants.remove(player)
-
-        print(f"{self.dealer.name} has {self.dealer.print_hand_list()} at {self.dealer.evaluate_deck()}")
-
-        for player in self.participants:
-            print(f"{player.name} has {player.print_hand_list()} at {player.evaluate_deck()}")
-            if player.evaluate_deck() == 21 and len(player.hand) == 2:
+            print()
+            print(f"{player.name} has {player.print_hand_list()} at {player.score_of_stand_hand}")
+            if player.score_of_stand_hand == 21 and len(player.hand) == 2:  
                 print("You have BlackJack... nice one!")
-                if self.dealer.evaluate_deck() == 21 and len(self.dealer.hand) == 2:
+                if self.dealer.score_of_stand_hand == 21 and len(self.dealer.hand) == 2:
                     print(f"... but so did the dealer. Unlucky. Keep your stake of {player.stake}")
                     player.budget += player.stake
                     player.stake = 0
@@ -149,17 +159,17 @@ class Game:
                     player.budget += player.stake * 2
                     player.stake = 0
 
-            elif player.evaluate_deck() > self.dealer.evaluate_deck():
+            elif player.score_of_stand_hand > self.dealer.score_of_stand_hand:
                 print(f"nice play.. you won {player.stake}")
                 player.budget += player.stake * 2
                 player.stake = 0
 
-            elif player.evaluate_deck() < self.dealer.evaluate_deck():
+            elif player.score_of_stand_hand < self.dealer.score_of_stand_hand:
                 print(f"unlucky mate you lost {player.stake}")
                 player.budget -= player.stake
                 player.stake = 0
             else:
-                print(f"PUSH you have {player.evaluate_deck()} but so did the dealer")
+                print(f"PUSH you have {player.score_of_stand_hand} but so did the dealer")
                 player.budget += player.stake
                 player.stake = 0           
             print("/")
@@ -168,7 +178,6 @@ class Game:
 def main():
     game_on = True    
     while game_on:
-        
         poker_game = Game("Black Jack")
         print(poker_game)
 
@@ -194,7 +203,7 @@ def main():
         #todo refactor this repeated user input code to 
         while True:
             try:
-                another_game = input("Another game? Yes/No")
+                another_game = input("Another game? Yes/No: ")
                 if another_game.lower().startswith('y'):
                     print("Allez")
                     break
