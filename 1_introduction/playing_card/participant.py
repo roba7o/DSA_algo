@@ -6,9 +6,9 @@ from card import *
 class Participant:
     def __init__(self):
         self.hand = []
-        self.score_of_stand_hand = None
-        self.person = self.generate_random_name_and_budget()
-        self.random_name, self.random_budget = list(self.person.items())[0]
+        self.stand_score = None
+        self.random_person = self.generate_random_name_and_budget()
+        self.random_name, self.random_budget = list(self.random_person.items())[0]
         self.name = None
         self.budget = None
         self.stake = None
@@ -47,7 +47,7 @@ class Participant:
         
     def make_move(self):
         """
-        returns boolean to take card or not. my_player will overwrite this 
+        FOR COMPUTER returns boolean to take card or not. my_player will overwrite this 
         """
         if self.evaluate_deck() < 17:
             return True 
@@ -69,20 +69,16 @@ class Participant:
                 non_ace_total += card.card_power()
             else:
                 num_of_aces += 1
-
         total = non_ace_total
 
         for i in range(num_of_aces):
             #(num_of_aces - i - 1) is number of remaining aces (aka since Ace = 1 here its accounting for minumum extra total)
+            #1 represents the 11, num_of_aces - i is the aces already accounted for in the loop
             if total + 11 + (num_of_aces - i - 1) <= 21:
                 total += 11
             else:
                 total += 1
-
         return total
-
-
-  
 
 class MyPlayer(Participant):
     def __init__(self, name):
@@ -97,25 +93,16 @@ class MyPlayer(Participant):
             else:
                 while True:
                     try:
-                        ace_decision = int(input("11 or 1 for Ace? "))
-                        total += ace_decision
-                        break
+                        if total + 11 > 21:
+                            print("Adding 11 here busts so ace is 1")
+                            total + 1
+                        else:
+                            ace_decision = int(input("11 or 1 for Ace? "))
+                            total += ace_decision
+                            break
                     except ValueError:
                         print("Please select 1 or 11")
         return total
-
-    # def make_move(self):
-    #     while True:
-    #         try:
-    #             move = input("Hit or Stand")
-    #             if move.lower().startswith("h"):
-    #                 return True
-    #             elif move.lower().startswith("s"):
-    #                 return False
-    #             else:
-    #                 raise ValueError("hit or stand mate? ")
-    #         except ValueError:
-    #             print("please be normal")
 
     def make_move(self):
         while True:
@@ -126,7 +113,6 @@ class MyPlayer(Participant):
                 return False
             else:
                 print("Please enter 'hit' or 'stand'.")
-
 
     def __str__(self):
         return f"Hello my name is {self.name}"
@@ -141,7 +127,7 @@ class MyPlayer(Participant):
                 if user_input < 1000:
                     raise ValueError("Too low for this table")
                 if user_input > 100000:
-                    raise ValueError("Please choose another casino mr gates")
+                    raise ValueError("Please choose another casino mr wayne")
                 self.budget = user_input
                 break
             except ValueError:
@@ -185,7 +171,6 @@ class ComputerPlayer(Participant):
         return random.randint(1000, self.budget)
     
     #todo make move for computer based on score. returns true or f
-         
 
 class Dealer(Participant):
     def __init__(self):

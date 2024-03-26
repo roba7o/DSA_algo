@@ -23,14 +23,14 @@ rank_list_string = list(rank_list_dict.keys())
 
 class Card:
     def __init__(self, suit, rank):
-        self._suit = suit
-        self._rank = rank
         self.suit_list = suit_list_string
         self.rank_list = rank_list_string
-        self._power = self.card_power() #this will be overwritten when the ace is chosen. -> checks ace each round -> asks which one -> manually sets power for round
+        self.suit = suit
+        self.rank = rank
+        self.power = self.card_power() 
 
     def __str__(self):
-        return f"{self._rank} of {self._suit}"
+        return f"{self.rank} of {self.suit}"
     
     """
     Main attributes
@@ -39,6 +39,7 @@ class Card:
     @property
     def suit(self):
         return self._suit
+    
     @suit.setter
     def suit(self, new_suit):
         if new_suit not in self.suit_list:
@@ -48,6 +49,7 @@ class Card:
     @property
     def rank(self):
         return self._rank
+    
     @rank.setter
     def rank(self, new_rank):
         if new_rank not in self.rank_list:
